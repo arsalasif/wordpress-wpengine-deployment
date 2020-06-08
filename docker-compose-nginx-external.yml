@@ -1,0 +1,44 @@
+version: '3'
+# Rename to docker-compose.yml to run locally.
+
+services:
+  wordpress:
+    image: wordpress:5.4.1-php7.3-fpm
+    volumes:
+      - ./wordpress:/var/www/html:cached # Full wordpress project
+      - ./wordpress/wp-config.php:/var/www/html/wp-config.php:cached # wp-config
+      - ./config/php.conf.ini:/usr/local/etc/php/conf.d/conf.ini:cached
+    restart: always
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:cached
+      - ./nginx/timeout.conf:/etc/nginx/conf.d/timeout.conf:cached
+      - ./logs/nginx:/var/log/nginx:cached
+      - ./wordpress:/var/www/html:cached
+      - ./wordpress/wp-config.php:/var/www/html/wp-config.php:cached # wp-config
+      - ./certs:/certs:cached
+    depends_on:
+      - wordpress
+    restart: always
+
+  # If you want to use mysql tunnel
+  # mysql-tunnel:
+  #   build: ./mysql-tunnel
+  #   volumes:
+  #     - ~/.ssh:/tmp/.ssh
+  #   ports:
+  #     - 3306:3306
+  #   # stdin_open: true
+  #   # tty: true
+  #   # ports:
+  #   #   - 3306:3306
+  #   # volumes:
+  #   #   - ~/.ssh/wpengine_rsa:/home/docker/.ssh-external/wpengine_rsa:ro
+  #   # environment:
+  #   #     - remote_host=WPEENVNAMEDEV.sftp.wpengine.com
+  #   #     - remote_user=WPEENVNAMEDEV
+  #   #     - remote_port=13306

@@ -1,0 +1,41 @@
+version: '3'
+# Rename to docker-compose.yml to run locally.
+
+services:
+  wordpress:
+    image: wordpress:5.4.1-php7.3
+    restart: always
+    ports:
+      - 80:80 # change port if required
+    volumes:
+      - ./wordpress:/var/www/html:cached # Full wordpress project
+      - ./wordpress/wp-config.php:/var/www/html/wp-config.php:cached # wp-config
+    depends_on:
+      - db
+  db:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: localdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db/seed:/docker-entrypoint-initdb.d:cached
+      - ./db/data:/var/lib/mysql:cached
+  pma:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: pass
+    ports:
+      - 8080:80
+    depends_on:
+      - db
+volumes:
+  wordpress:
+  db:

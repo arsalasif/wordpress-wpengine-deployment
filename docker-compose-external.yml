@@ -1,0 +1,14 @@
+version: '3'
+# Rename to docker-compose.yml to run locally.
+
+services:
+  wordpress:
+    image: wordpress:5.4.1-php7.3
+    restart: always
+    ports:
+      - 80:80 # change port if required
+    volumes:
+      - ./wordpress:/var/www/html:cached # Full wordpress project
+      - ./wordpress/wp-config.php:/var/www/html/wp-config.php:cached # wp-config
+volumes:
+  wordpress:

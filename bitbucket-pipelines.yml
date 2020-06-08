@@ -1,0 +1,67 @@
+pipelines:
+  branches:
+    release/development:
+      - step:
+          name: Deploy development
+          deployment: development
+          script:
+          - pipe: atlassian/rsync-deploy:0.4.2
+            variables:
+              USER: 'WPEENVNAMEDEV'
+              SERVER: 'WPEENVNAMEDEV.ssh.wpengine.net'
+              REMOTE_PATH: '/home/wpe-user/sites/WPEENVNAMEDEV/'
+              LOCAL_PATH: './wordpress/'
+              EXTRA_ARGS: ['-arvz', '--quiet', '--exclude-from=./wordpress/.rsync-exclude-file', '--exclude=.git/**', '--exclude=/.*']
+  custom:
+    release/staging:
+      - step:
+          name: Deploy staging
+          deployment: staging
+          script:
+          - pipe: atlassian/rsync-deploy:0.4.2
+            variables:
+              USER: 'WPEENVNAMESTAG'
+              SERVER: 'WPEENVNAMESTAG.ssh.wpengine.net'
+              REMOTE_PATH: '/home/wpe-user/sites/WPEENVNAMESTAG/'
+              LOCAL_PATH: './wordpress/'
+              EXTRA_ARGS: ['-arvz', '--quiet', '--exclude-from=./wordpress/.rsync-exclude-file', '--exclude=.git/**', '--exclude=/.*']
+          - pipe: atlassian/ssh-run:0.2.5
+            variables:
+              SSH_USER: 'WPEENVNAMEDEV'
+              SERVER: 'WPEENVNAMEDEV.ssh.wpengine.net'
+              MODE: 'script'
+              COMMAND: './migration/dev_export.sh'
+          - rsync -rp --delete-after -arvz --quiet WPEENVNAMEDEV@WPEENVNAMEDEV.ssh.wpengine.net:/home/wpe-user/sites/WPEENVNAMEDEV/migrate_sql/ $BITBUCKET_CLONE_DIR/migrate_sql/
+          - rsync -rp --delete-after -arvz --quiet $BITBUCKET_CLONE_DIR/migrate_sql/ WPEENVNAMESTAG@WPEENVNAMESTAG.ssh.wpengine.net:/home/wpe-user/sites/WPEENVNAMESTAG/migrate_sql/
+          - pipe: atlassian/ssh-run:0.2.5
+            variables:
+              SSH_USER: 'WPEENVNAMESTAG'
+              SERVER: 'WPEENVNAMESTAG.ssh.wpengine.net'
+              MODE: 'script'
+              COMMAND: './migration/stag_import.sh'
+    release/production:
+      - step:
+          name: Deploy production
+          deployment: production
+          script:
+          - pipe: atlassian/rsync-deploy:0.4.2
+            variables:
+              USER: 'WPEENVNAMEPROD'
+              SERVER: 'WPEENVNAMEPROD.ssh.wpengine.net'
+              REMOTE_PATH: '/home/wpe-user/sites/WPEENVNAMEPROD/'
+              LOCAL_PATH: './wordpress/'
+              EXTRA_ARGS: ['-arvz', '--quiet', '--exclude-from=./wordpress/.rsync-exclude-file', '--exclude=.git/**', '--exclude=/.*']
+          - pipe: atlassian/ssh-run:0.2.5
+            variables:
+              SSH_USER: 'WPEENVNAMESTAG'
+              SERVER: 'WPEENVNAMESTAG.ssh.wpengine.net'
+              MODE: 'script'
+              COMMAND: './migration/stag_export.sh'
+          - rsync -rp --delete-after -arvz --quiet WPEENVNAMESTAG@WPEENVNAMESTAG.ssh.wpengine.net:/home/wpe-user/sites/WPEENVNAMESTAG/migrate_sql/ $BITBUCKET_CLONE_DIR/migrate_sql/
+          - rsync -rp --delete-after -arvz --quiet $BITBUCKET_CLONE_DIR/migrate_sql/ WPEENVNAMEPROD@WPEENVNAMEPROD.ssh.wpengine.net:/home/wpe-user/sites/WPEENVNAMEPROD/migrate_sql/
+          - pipe: atlassian/ssh-run:0.2.5
+            variables:
+              SSH_USER: 'WPEENVNAMEPROD'
+              SERVER: 'WPEENVNAMEPROD.ssh.wpengine.net'
+              MODE: 'script'
+              COMMAND: './migration/prod_import.sh'

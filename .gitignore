@@ -1,0 +1,15 @@
+*~
+.DS_Store
+.svn
+.cvs
+*.bak
+*.swp
+Thumbs.db
+
+db/data
+docker-compose.yml
+db/seed
+local-backup
+certs
+logs/nginx
+dbv
