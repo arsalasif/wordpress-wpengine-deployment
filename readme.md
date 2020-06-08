@@ -3,6 +3,8 @@
 
 # Wordpress Automated Deployment to WPEngine
 
+!! Contributions are welcome
+
 ## Contents
 
 * [Requirements](#requirements)
