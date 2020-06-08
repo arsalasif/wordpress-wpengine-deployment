@@ -1,7 +1,7 @@
 
 
 
-# Wordpress-Automated-Deployment-WPEngine
+# Wordpress Automated Deployment to WPEngine
 
 ## Contents
 
