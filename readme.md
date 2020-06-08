@@ -7,7 +7,7 @@
 
 * [Requirements](#requirements)
 * [Features](#features)
-* [Quick Start](#quick-start)
+* [Setup](#setup)
 * [Deployments](#deployments)
 
 ## Requirements:
@@ -25,10 +25,10 @@
 * Automated deployment to Development, Staging and Production.
 
 
-## Quick Start:
- 1. [Get Repository](#get-repository)
- 2. [Run Options](#run-options)
- 3. [Start up Docker](#start-up-docker)
+## Setup:
+ 1. [Get Repository](#1-get-repository-and-upload-to-bitbucket)
+ 2. [Run Options](#2-run-options)
+ 3. [Start up Docker](#3-start-up-docker)
 ### 1. Get Repository and Upload to BitBucket
 Download this repository and upload on your BitBucket account.
 Create 3 branches:
@@ -138,9 +138,9 @@ Finally, test that everything works by going to http://localhost/wp-admin and en
 
 
 ## Deployments:
-* [1. Development](#development)
-* [2. Staging](#staging)
-* [3. Production](#production)
+* [1. Development](#1-development)
+* [2. Staging](#2-staging)
+* [3. Production](#3-production)
 
 ### 1. Development
 
